@@ -7,6 +7,7 @@ import { auth, db } from "../../firebaseConfig";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
+import Constants from "../../utils/Constants";
 
 const ChefRegisterScreen = () => {
   const navigation = useNavigation();
@@ -37,6 +38,7 @@ const ChefRegisterScreen = () => {
           address,
           email,
           userId: user.uid,
+          role: Constants.ROLE_FOOD_VENDOR
         });
         Alert.alert("Success", "Registration Successful!");
       } else {

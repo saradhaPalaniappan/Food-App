@@ -3,13 +3,13 @@ import React, { useState } from "react";
 import { useSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context";
 import { Checkbox, IconButton } from "react-native-paper";
 import { TouchableOpacity } from "react-native";
-import { auth, db } from "../firebaseConfig";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
-import Constants from "../utils/Constants";
+import Constants from "../../utils/Constants";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../../firebaseConfig";
 
-const UserRegisterScreen = () => {
+const DeliveryPartnerRegisterScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [isSignUp, setIsSignUp] = useState(false);
@@ -36,7 +36,7 @@ const UserRegisterScreen = () => {
           address,
           email,
           userId: user.uid,
-          role: Constants.ROLE_FOOD_BUYER
+          role: Constants.ROLE_DELIVERY_PARTNER
         });
         Alert.alert("Success", "Registration Successful!");
       } else {
@@ -59,7 +59,7 @@ const UserRegisterScreen = () => {
       <View style={{ paddingTop: insets.top, paddingBottom: insets.bottom }} className={`bg-white flex-1 items-center ${isSignUp ? "" : "mt-20"}`}>
         <View className="border border-yellow p-10 rounded-xl m-4 mt-10 w-80">
           <Text className="font-bold text-3xl text-orange absolute -top-6 left-10 bg-white">
-            User {isSignUp ? "Register" : "Login"}
+            Delivery Partner {isSignUp ? "Register" : "Login"}
           </Text>
           <ScrollView className="flex-grow-0" showsVerticalScrollIndicator={false}>
             {isSignUp && (
@@ -122,4 +122,4 @@ const UserRegisterScreen = () => {
   );
 };
 
-export default UserRegisterScreen;
+export default DeliveryPartnerRegisterScreen;

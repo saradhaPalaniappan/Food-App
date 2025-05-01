@@ -20,8 +20,13 @@ const LoginSelectScreen = () => {
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => Navigation.navigate("ChefRegister")}>
-        <Text className="bg-primary w-60 p-2 rounded-lg text-center text-lg">
+        <Text className="bg-primary w-60 p-2 rounded-lg text-center mb-10 text-lg">
           Become a chef
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => Navigation.navigate("DeliveryPartnerRegister")}>
+        <Text className="bg-primary w-60 p-2 rounded-lg text-center text-lg">
+          Want to Deliver
         </Text>
       </TouchableOpacity>
     </View>
