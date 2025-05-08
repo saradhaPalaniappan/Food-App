@@ -25,12 +25,20 @@ const LoginSelectScreen = () => {
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => Navigation.navigate("DeliveryPartnerRegister")}>
-        <Text className="bg-primary w-60 p-2 rounded-lg text-center text-lg">
+        <Text className="bg-primary w-60 p-2 rounded-lg text-center text-lg mb-2">
           Want to Deliver
         </Text>
       </TouchableOpacity>
+      <Text className="mt-2 font-semibold text-lg text-white">
+        {"Admin" + " "  } 
+        <Text className="text-white underline" onPress={() => setIsSignUp(!isSignUp)}>
+          Login
+        </Text>
+      </Text>
     </View>
+    
   );
 };
 
 export default LoginSelectScreen;
+

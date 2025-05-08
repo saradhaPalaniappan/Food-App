@@ -84,6 +84,11 @@ export default function App() {
               component={DeliveryPartnerRegisterScreen}
               options={{ title: "Welcome" }}
             />
+            <Stack.Screen
+              name="AdminLogin"
+              component={AdminLoginScreen}
+              options={{ title: "Welcome" }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>
