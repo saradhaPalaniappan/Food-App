@@ -31,7 +31,7 @@ const LoginSelectScreen = () => {
       </TouchableOpacity>
       <Text className="mt-2 font-semibold text-lg text-white">
         {"Admin" + " "  } 
-        <Text className="text-white underline" onPress={() => setIsSignUp(!isSignUp)}>
+        <Text className="text-white underline" onPress={() => Navigation.navigate("AdminLogin")}>
           Login
         </Text>
       </Text>

@@ -5,7 +5,7 @@ import { Checkbox, IconButton } from "react-native-paper";
 import { TouchableOpacity } from "react-native";
 import { auth, db } from "../../firebaseConfig";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
+import { setDoc, doc, collection, query, where, getDocs } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import Constants from "../../utils/Constants";
 
@@ -41,17 +41,39 @@ const ChefRegisterScreen = () => {
           role: Constants.ROLE_FOOD_VENDOR
         });
         Alert.alert("Success", "Registration Successful!");
+        setEmail('')
+        setPassword('')
+        setName('')
+        setPhone('')
+        setKitchenName('')
+        setAddress('')
+        navigation.navigate("ChefRegister");
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
-        Alert.alert("Success", "Login Successful!");
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Fetch user document based on UID
+        const usersRef = collection(db, "kitchens");
+        const q = query(usersRef, where("userId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const userData = userDoc.data();
+
+          if (userData.role !== Constants.ROLE_FOOD_VENDOR) {
+            await auth.signOut();
+            Alert.alert("Error", "Access denied. Only FOOD_VENDOR can log in.");
+            return;
+          }
+          Alert.alert("Success", "Login Successful!");
+          navigation.navigate("ChefLandingScreen");
+        } else {
+          await auth.signOut();
+          Alert.alert("Error", "User data not found.");
+        }
       }
-      setEmail('')
-      setPassword('')
-      setName('')
-      setPhone('')
-      setKitchenName('')
-      setAddress('')
-      navigation.navigate("ChefLandingScreen");
+      
     } catch (error) {
       Alert.alert("Error", error.message);
     }

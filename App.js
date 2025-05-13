@@ -18,6 +18,7 @@ import ChefOrderRequestScreen from "./screens/chefScreens/ChefOrderRequestScreen
 import ChefOrdersScreen from "./screens/chefScreens/ChefOrdersScreen";
 import ChefRemaindersScreen from "./screens/chefScreens/ChefRemaindersScreen";
 import DeliveryPartnerRegisterScreen from "./screens/deliveryPartnerScreens/DeliveryPartnerRegisterScreen";
+import AdminLoginScreen from "./screens/adminScreens/AdminLoginScreen";
 
 const Stack = createNativeStackNavigator();
 

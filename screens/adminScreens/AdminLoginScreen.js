@@ -5,7 +5,9 @@ import { IconButton } from "react-native-paper";
 import { TouchableOpacity } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
-import { auth } from "../../firebaseConfig";
+import { auth, db } from "../../firebaseConfig";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import Constants from "../../utils/Constants";
 
 const AdminLoginScreen = () => {
   const navigation = useNavigation();
@@ -16,9 +18,29 @@ const AdminLoginScreen = () => {
 
   const handleAuth = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert("Success", "Login Successful!");
-      navigation.navigate("LandingScreen");
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Fetch user document based on UID
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("userId", "==", user.uid));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        const userData = userDoc.data();
+
+        if (userData.role !== Constants.ROLE_BACKEND_USER || userData.role !== Constants.ROLE_SUPER_ADMIN) {
+          await auth.signOut();
+          Alert.alert("Error", "Access denied. Only BACKEND_USER or ADMIN can log in.");
+          return;
+        }
+        Alert.alert("Success", "Login Successful!");
+        navigation.navigate("LandingScreen");
+      } else {
+        await auth.signOut();
+        Alert.alert("Error", "User data not found.");
+      }
     } catch (error) {
       Alert.alert("Error", error.message);
     }

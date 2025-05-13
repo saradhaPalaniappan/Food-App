@@ -6,7 +6,7 @@ import { TouchableOpacity } from "react-native";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import Constants from "../../utils/Constants";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { auth, db } from "../../firebaseConfig";
 
 const DeliveryPartnerRegisterScreen = () => {
@@ -39,16 +39,37 @@ const DeliveryPartnerRegisterScreen = () => {
           role: Constants.ROLE_DELIVERY_PARTNER
         });
         Alert.alert("Success", "Registration Successful!");
+        setEmail('');
+        setPassword('');
+        setName('');
+        setPhone('');
+        setAddress('');
+        navigation.navigate("LandingScreen");
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
-        Alert.alert("Success", "Login Successful!");
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Fetch user document based on UID
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("userId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const userData = userDoc.data();
+
+          if (userData.role !== Constants.ROLE_DELIVERY_PARTNER) {
+            await auth.signOut();
+            Alert.alert("Error", "Access denied. Only DELIVERY_PARTNER can log in.");
+            return;
+          }
+          Alert.alert("Success", "Login Successful!");
+          navigation.navigate("LandingScreen");
+        } else {
+          await auth.signOut();
+          Alert.alert("Error", "User data not found.");
+        }
       }
-      setEmail('');
-      setPassword('');
-      setName('');
-      setPhone('');
-      setAddress('');
-      navigation.navigate("LandingScreen");
     } catch (error) {
       Alert.alert("Error", error.message);
     }
