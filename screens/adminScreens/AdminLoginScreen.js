@@ -30,7 +30,7 @@ const AdminLoginScreen = () => {
         const userDoc = querySnapshot.docs[0];
         const userData = userDoc.data();
 
-        if (userData.role !== Constants.ROLE_BACKEND_USER || userData.role !== Constants.ROLE_SUPER_ADMIN) {
+        if (userData.role !== Constants.ROLE_BACKEND_USER && userData.role !== Constants.ROLE_SUPER_ADMIN) {
           await auth.signOut();
           Alert.alert("Error", "Access denied. Only BACKEND_USER or ADMIN can log in.");
           return;
@@ -60,15 +60,15 @@ const AdminLoginScreen = () => {
             </View>
             <View className="mt-4 relative">
               <Text className="text-lg ml-2">Password</Text>
-              <TextInput 
-                placeholder="Enter your password" 
-                className="border border-orange p-2 rounded-lg pr-10" 
-                secureTextEntry={secureText} 
-                value={password} 
-                onChangeText={setPassword} 
+              <TextInput
+                placeholder="Enter your password"
+                className="border border-orange p-2 rounded-lg pr-10"
+                secureTextEntry={secureText}
+                value={password}
+                onChangeText={setPassword}
               />
-              <TouchableOpacity 
-                onPress={() => setSecureText(!secureText)} 
+              <TouchableOpacity
+                onPress={() => setSecureText(!secureText)}
                 style={{ position: 'absolute', right: 1, top: '28%' }}
               >
                 <IconButton icon={secureText ? "eye-off" : "eye"} color="orange" />
