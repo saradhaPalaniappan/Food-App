@@ -111,7 +111,7 @@ const ChefLandingScreen = () => {
           {kitchenName || "Kitchen"}
         </Text>
       )}
-
+      <Text className="text-orange p-1 text-center text-xl mx-1 mb-2">Our food app is designed to empower home cooks, especially homemakers, by turning their passion for cooking into a source of extra income. It allows them to sell surplus or specially prepared meals directly from their kitchens to local customers. The app handles orders, payments, and customer communication, making the process simple and secure. Cooks can showcase their menus, set availability, and receive feedback to grow their reputation. This not only reduces food waste but also supports financial independence. Whether part-time or daily, the app creates a flexible platform for homemakers to earn while doing what they love—cooking delicious meals.</Text>
       <Text className="text-lg text-center mb-2">Today's Menu ({today})</Text>
       <TodaysMenu />
 

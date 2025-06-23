@@ -15,6 +15,7 @@ const OrderNowTabScreen = () => {
   return (
     <View className="flex-1 bg-primary">
       <SearchBar placeholder="Search food..." />
+      <Text className="text-orange p-1 text-center text-xl mx-1 mt-2 mb-2">This app connects users to home-cooked meals prepared by local chefs. It offers healthy, preservative-free food that's both affordable and nutritious. All kitchens are approved through strict verification, with periodic inspections and surprise inspections to ensure hygiene and quality. The platform supports small-scale cooks, promotes community well-being, and provides an economical-traditional alternative to commercial dining, all with a strong focus on safety and health.</Text>
       <View>
         <TopSection />
       </View>

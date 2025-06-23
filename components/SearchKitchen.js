@@ -29,12 +29,14 @@ const SearchKitchen = ({ visible, onClose, placeholder }) => {
       const kitchenSnap = await getDoc(kitchenRef);
 
       if (kitchenSnap.exists()) {
+
         setKitchenDetails(kitchenSnap.data());
 
         const scheduleRef = doc(db, 'kitchens', searchText, 'weeklySchedule', today);
         const scheduleSnap = await getDoc(scheduleRef);
 
         if (scheduleSnap.exists()) {
+
           const scheduleData = scheduleSnap.data();
           const newDishesByCategory = { breakfast: [], lunch: [], dinner: [] };
 

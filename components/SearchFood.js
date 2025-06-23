@@ -28,6 +28,7 @@ const SearchFood = ({ visible, onClose, placeholder }) => {
         const validKitchens = [];
 
         for (const kitchenDoc of querySnapshot.docs) {
+
             const kname = kitchenDoc.data().kitchenName;
 
             const menuRef = collection(db, 'kitchens', kname, 'menu');
@@ -42,10 +43,13 @@ const SearchFood = ({ visible, onClose, placeholder }) => {
             });
 
             if (matchedDish) {
+
                 const scheduleRef = doc(db, 'kitchens', kname, 'weeklySchedule', today);
+
                 const scheduleSnap = await getDoc(scheduleRef);
 
                 if (scheduleSnap.exists()) {
+
                     const category = getCurrentCategory();
                     const meals = scheduleSnap.data()[category];
 
