@@ -19,6 +19,7 @@ import ChefOrdersScreen from "./screens/chefScreens/ChefOrdersScreen";
 import ChefRemaindersScreen from "./screens/chefScreens/ChefRemaindersScreen";
 import DeliveryPartnerRegisterScreen from "./screens/deliveryPartnerScreens/DeliveryPartnerRegisterScreen";
 import AdminLoginScreen from "./screens/adminScreens/AdminLoginScreen";
+import ChefList from "./screens/ChefList";
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +37,11 @@ export default function App() {
             <Stack.Screen
               name="UserRegister"
               component={UserRegisterScreen}
+              options={{ title: "Welcome" }}
+            />
+            <Stack.Screen
+              name="ChefList"
+              component={ChefList}
               options={{ title: "Welcome" }}
             />
             <Stack.Screen
