@@ -27,10 +27,12 @@ const ChefRegisterScreen = () => {
       Alert.alert("Error", "All fields are required!");
       return;
     }
+
     try {
       if (isSignUp) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+
         await setDoc(doc(db, "kitchens", kitchenName), {
           name,
           phone,
@@ -38,21 +40,21 @@ const ChefRegisterScreen = () => {
           address,
           email,
           userId: user.uid,
-          role: Constants.ROLE_FOOD_VENDOR
+          role: Constants.ROLE_FOOD_VENDOR,
+          status: "Pending Approval"
         });
-        Alert.alert("Success", "Registration Successful!");
-        setEmail('')
-        setPassword('')
-        setName('')
-        setPhone('')
-        setKitchenName('')
-        setAddress('')
-        navigation.navigate("ChefRegister");
+
+        Alert.alert("Registration Successful", "You will be verified by admin.");
+        setEmail('');
+        setPassword('');
+        setName('');
+        setPhone('');
+        setKitchenName('');
+        setAddress('');
       } else {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Fetch user document based on UID
         const usersRef = collection(db, "kitchens");
         const q = query(usersRef, where("userId", "==", user.uid));
         const querySnapshot = await getDocs(q);
@@ -66,6 +68,19 @@ const ChefRegisterScreen = () => {
             Alert.alert("Error", "Access denied. Only FOOD_VENDOR can log in.");
             return;
           }
+
+          if (userData.status === "Pending Approval") {
+            await auth.signOut();
+            Alert.alert("Notice", "You are not yet verified by the admin.");
+            return;
+          }
+
+          if (userData.status === "Disabled") {
+            await auth.signOut();
+            Alert.alert("Access Denied", "You are being disabled. Please contact admin.");
+            return;
+          }
+
           Alert.alert("Success", "Login Successful!");
           navigation.navigate("ChefLandingScreen");
         } else {
@@ -73,7 +88,6 @@ const ChefRegisterScreen = () => {
           Alert.alert("Error", "User data not found.");
         }
       }
-      
     } catch (error) {
       Alert.alert("Error", error.message);
     }
@@ -81,8 +95,7 @@ const ChefRegisterScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={{ paddingTop: insets.top, paddingBottom: insets.bottom }} 
-      className={`bg-white flex-1 items-center ${isSignUp ? "" : "mt-20"}`}>
+      <View style={{ paddingTop: insets.top, paddingBottom: insets.bottom }} className={`bg-white flex-1 items-center ${isSignUp ? "" : "mt-20"}`}>
         <View className="border border-yellow p-10 rounded-xl m-4 mt-10 w-80">
           <Text className="font-bold text-3xl text-orange absolute -top-6 left-10 bg-white">
             Chef {isSignUp ? "Register" : "Login"}

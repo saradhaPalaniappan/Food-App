@@ -1,11 +1,12 @@
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Modal, TextInput} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Modal, TextInput } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { UserIcon, ChevronDownIcon, ChevronUpIcon, PencilIcon, CheckIcon } from "react-native-heroicons/solid";
 import { auth, db } from "../firebaseConfig";
 import { collection, query, where, getDocs, doc, updateDoc, setDoc, deleteDoc } from "firebase/firestore";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
+import Constants from "../utils/Constants";
 
 const AccountTabScreen = () => {
   const insets = useSafeAreaInsets();
@@ -143,12 +144,23 @@ const AccountTabScreen = () => {
             ))}
           </View>
         )}
-        <TouchableOpacity className="">
+
+        <TouchableOpacity>
           <View className="p-3 mx-4 mb-3 flex-row">
             <MaterialIcons name="settings" size={20} color="orange" />
             <Text className="font-semibold text-xl ml-5">Settings</Text>
           </View>
         </TouchableOpacity>
+
+        {userData?.role === Constants.ROLE_SUPER_ADMIN && (
+          <TouchableOpacity onPress={() => Navigation.navigate("ChefList")}>
+            <View className="p-3 mx-4 mb-3 flex-row">
+              <MaterialCommunityIcons name="chef-hat" size={20} color="orange" />
+              <Text className="font-semibold text-xl ml-5">Chef List</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity onPress={() => Navigation.navigate("UserRegister")}>
           <View className="p-3 mx-4 mb-3 flex-row">
             <MaterialIcons name="power-settings-new" size={20} color="orange" />
