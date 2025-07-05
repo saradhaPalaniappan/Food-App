@@ -1,6 +1,7 @@
 import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, ActivityIndicator, Modal, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DataTable } from "react-native-paper";
 import FABNav from "../../components/chefComponents/FABNav";
@@ -15,6 +16,7 @@ const ChefLandingScreen = () => {
   const [loading, setLoading] = useState(true);
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [deliveredCount, setDeliveredCount] = useState(0);
+  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -102,16 +104,47 @@ const ChefLandingScreen = () => {
             Earned: <Text className="text-orange font-semibold">{totalEarnings}</Text>
           </Text>
         </View>
+  
+        {/* Info icon button visible top right below header */}
+        <TouchableOpacity
+          onPress={() => setShowDescriptionModal(true)}
+          style={{ alignSelf: 'flex-end', marginTop: 6 }}
+          accessibilityLabel="App Info"
+        >
+          <Ionicons name="information-circle-outline" size={28} color="#FFA500" />
+        </TouchableOpacity>
       </View>
 
       {loading ? (
         <ActivityIndicator size="small" color="#FFA500" />
       ) : (
         <Text className="bg-gray p-2 text-center text-xl mx-4 mb-4">
-          {kitchenName || "Kitchen"}
+            {kitchenName || "Kitchen"}
         </Text>
       )}
-      <Text className="text-orange p-1 text-center text-xl mx-1 mb-2">Our food app is designed to empower home cooks, especially homemakers, by turning their passion for cooking into a source of extra income. It allows them to sell surplus or specially prepared meals directly from their kitchens to local customers. The app handles orders, payments, and customer communication, making the process simple and secure. Cooks can showcase their menus, set availability, and receive feedback to grow their reputation. This not only reduces food waste but also supports financial independence. Whether part-time or daily, the app creates a flexible platform for homemakers to earn while doing what they love—cooking delicious meals.</Text>
+      <Modal
+        visible={showDescriptionModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowDescriptionModal(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center' }}>
+          <View style={{ backgroundColor: 'white', margin: 24, borderRadius: 14, padding: 24, maxHeight: '80%' }}>
+            <ScrollView>
+              <Text className="text-orange text-lg mb-2 font-semibold text-center">Info</Text>
+              <Text className="text-gray-700 text-base">
+                Our food app is designed to empower home cooks, especially homemakers, by turning their passion for cooking into a source of extra income. It allows them to sell surplus or specially prepared meals directly from their kitchens to local customers. The app handles orders, payments, and customer communication, making the process simple and secure. Cooks can showcase their menus, set availability, and receive feedback to grow their reputation. This not only reduces food waste but also supports financial independence. Whether part-time or daily, the app creates a flexible platform for homemakers to earn while doing what they love—cooking delicious meals.
+              </Text>
+            </ScrollView>
+            <TouchableOpacity
+              onPress={() => setShowDescriptionModal(false)}
+              style={{ marginTop: 16, backgroundColor: '#FFA500', paddingVertical: 10, borderRadius: 8 }}
+            >
+              <Text className="text-white text-center text-base">Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <Text className="text-lg text-center mb-2">Today's Menu ({today})</Text>
       <TodaysMenu />
 
