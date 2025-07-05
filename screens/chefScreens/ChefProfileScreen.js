@@ -17,6 +17,7 @@ const ChefProfileScreen = () => {
   const Navigation = useNavigation();
   const [ownerName, setOwnerName] = useState(null);
   const [kitchenName, setKitchenName] = useState(null);
+  const [fssaiNumber, setfssaiNumber] = useState(null);
   const [address, setAddress] = useState(null);
   const [chefID, setChefID] = useState(null)
   const [loading, setLoading] = useState(true);
@@ -42,6 +43,7 @@ const ChefProfileScreen = () => {
             setKitchenName(kitchenData.kitchenName);
             setAddress(kitchenData.address);
             setChefID(kitchenData.userId)
+            setfssaiNumber(kitchenData.fssaiNumber)
           } else {
             console.log("No kitchen found for this user!");
           }
@@ -110,6 +112,11 @@ const ChefProfileScreen = () => {
         </View>
       </View>
 
+      <ProfileSubComponents
+        title="FSSAI Number:"
+        desc={fssaiNumber}
+        field="fssaiNumber"
+      />
       <ProfileSubComponents
         title="Kitchen Name:"
         desc={kitchenName}
