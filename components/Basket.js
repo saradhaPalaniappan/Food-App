@@ -7,8 +7,51 @@ import { db, auth } from "../firebaseConfig";
 import { doc, getDoc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
 import moment from "moment";
 
+import { useEffect } from "react";
+
 const Basket = observer(() => {
   const [open, setOpen] = useState(false);
+  const [quantities, setQuantities] = useState({}); // { "kitchenName:dishName": kitchenQuantity }
+
+  // Fetch latest kitchenQuantity for all cart items when cart changes or modal opens
+  useEffect(() => {
+    async function fetchAllQuantities() {
+      const today = new Date().toLocaleString("en-US", { weekday: "long" });
+      let qMap = {};
+      for (const item of cartStore.cart) {
+        // use orderType like in KitchenFoodDisplay.js
+        const currentHour = new Date().getHours();
+        let ordType = "";
+        if (currentHour >= 6 && currentHour < 12) ordType = "breakfast";
+        else if (currentHour >= 12 && currentHour < 17) ordType = "lunch";
+        else if (currentHour >= 17 && currentHour < 23) ordType = "dinner";
+
+        try {
+          const scheduleRef = doc(db, `kitchens/${item.kitchenName}/weeklySchedule`, today);
+          const scheduleSnap = await getDoc(scheduleRef);
+          if (scheduleSnap.exists()) {
+            const scheduleData = scheduleSnap.data();
+            const mealArray = scheduleData[ordType];
+            if (Array.isArray(mealArray)) {
+              const foundDish = mealArray.find(
+                d => d.dishName && d.dishName.toLowerCase() === item.dishName.toLowerCase()
+              );
+              if (foundDish) {
+                const quantity = Number(foundDish.quantity) || 0;
+                const sold = Number(foundDish.sold) || 0;
+                qMap[`${item.kitchenName}:${item.dishName}`] = Math.max(quantity - sold, 0);
+              }
+            }
+          }
+        } catch (e) {
+          // fallback
+          qMap[`${item.kitchenName}:${item.dishName}`] = null;
+        }
+      }
+      setQuantities(qMap);
+    }
+    if (open) fetchAllQuantities();
+  }, [cartStore.cart, open]);
 
   function handleOpen() {
     setOpen(!open);
@@ -166,7 +209,13 @@ const Basket = observer(() => {
                         <Text className="bg-secondary rounded-full h-8 w-8 text-center text-lg font-bold">-</Text>
                       </TouchableOpacity>
                       <Text className="text-lg mx-2">{item.quantity}</Text>
-                      <TouchableOpacity onPress={() => handleCounter(item.kitchenName, item.dishName, item.price, 1)}>
+                      <TouchableOpacity
+                        onPress={() => handleCounter(item.kitchenName, item.dishName, item.price, 1)}
+                        disabled={
+                          quantities[`${item.kitchenName}:${item.dishName}`] !== undefined &&
+                          item.quantity >= quantities[`${item.kitchenName}:${item.dishName}`]
+                        }
+                      >
                         <Text className="bg-secondary rounded-full h-8 w-8 text-center text-lg font-bold">+</Text>
                       </TouchableOpacity>
                     </View>

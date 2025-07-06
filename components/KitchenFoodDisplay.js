@@ -6,16 +6,61 @@ import { doc, getDoc } from "firebase/firestore";
 import cartStore from '../stores/CartStore';
 
 const KitchenFoodDisplay = observer((props) => {
+  const { kitchen } = props;
+  const [orderType, setOrderType] = useState("");
+  const [kitchenQuantity, setKitchenQuantity] = useState(null); // quantity from schedule
   const [dishDetails, setDishDetails] = useState({ price: "-", type: "-", description: "-" });
 
   useEffect(() => {
-    const fetchDishDetails = async () => {
+    const fetchDishDetailsAndQuantity = async () => {
       try {
+        const currentHour = new Date().getHours();
+        const today = new Date().toLocaleString("en-US", { weekday: "long" });
+        // Determine orderType based on hour
+        let ordType = "";
+        if (currentHour >= 6 && currentHour < 12) {
+          ordType = "Breakfast";
+        } else if (currentHour >= 12 && currentHour < 17) {
+          ordType = "Lunch";
+        } else if (currentHour >= 17 && currentHour < 23) {
+          ordType = "Dinner";
+        }
+        setOrderType(ordType);
+
+        // Fetch dish details
         const dishRef = doc(db, "kitchens", props.kname, "menu", props.name);
         const dishSnap = await getDoc(dishRef);
 
         if (dishSnap.exists()) {
           setDishDetails(dishSnap.data());
+          // Fetch kitchen's schedule to get quantity for current orderType
+          if (kitchen && kitchen.id && ordType) {
+            const kitchenId = kitchen.id;
+            const scheduleRef = doc(db, `kitchens/${kitchenId}/weeklySchedule`, today);
+            const scheduleSnap = await getDoc(scheduleRef);
+            if (scheduleSnap.exists()) {
+              const scheduleData = scheduleSnap.data();
+              const mealArray = scheduleData[ordType.toLowerCase()];
+              if (Array.isArray(mealArray)) {
+                const foundDish = mealArray.find(
+                  d =>
+                    d.dishName &&
+                    d.dishName.toLowerCase() === props.name.toLowerCase()
+                );
+                if (foundDish) {
+                  const quantity = Number(foundDish.quantity) || 0;
+                  const sold = Number(foundDish.sold) || 0;
+                  setKitchenQuantity(Math.max(quantity - sold, 0));
+                } else {
+                  setKitchenQuantity(0);
+                }
+              } else {
+                setKitchenQuantity(0);
+              }
+            } else {
+              setKitchenQuantity(0);
+            }
+          }
         } else {
           console.warn("Dish document not found");
         }
@@ -24,8 +69,9 @@ const KitchenFoodDisplay = observer((props) => {
       }
     };
 
-    fetchDishDetails();
-  }, [props.kname, props.name]);
+    fetchDishDetailsAndQuantity();
+    // Depend on kname, name, kitchen
+  }, [props.kname, props.name, kitchen]);
 
   // ✅ Hide non-veg dishes if Veg Only is enabled
   if (cartStore.isVegOnly && dishDetails.type?.toLowerCase() !== "veg") {
@@ -69,11 +115,16 @@ const KitchenFoodDisplay = observer((props) => {
       <View>
         <Image source={imageSource} className="w-28 h-32" />
         <View className="absolute flex-row bottom-0 items-center justify-center bg-[#fffbdc9e] w-full p-1">
-          <TouchableOpacity onPress={() => handleCounter(-1)}>
+          <TouchableOpacity onPress={() => handleCounter(-1)} disabled={cartStore.getQuantity(props.kname, props.name) === 0}>
             <Text className="bg-secondary rounded-full h-8 w-8 text-center text-lg font-bold">-</Text>
           </TouchableOpacity>
           <Text className="text-xl mx-2 text-center">{cartStore.getQuantity(props.kname, props.name)}</Text>
-          <TouchableOpacity onPress={() => handleCounter(1)}>
+          <TouchableOpacity
+            onPress={() => handleCounter(1)}
+            disabled = { (kitchenQuantity == null || kitchen == "") ||
+              (kitchenQuantity !== null && kitchenQuantity > 0 &&
+                cartStore.getQuantity(props.kname, props.name) >= kitchenQuantity)
+            }>
             <Text className="bg-secondary rounded-full h-8 w-8 text-center text-lg font-bold">+</Text>
           </TouchableOpacity>
         </View>

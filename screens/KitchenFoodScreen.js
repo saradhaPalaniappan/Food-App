@@ -101,6 +101,7 @@ const KitchenFoodScreen = ({ route }) => {
               name={dishName}
               kname={kitchen.kitchenName}
               category={category}
+              kitchen={kitchen}
             />
           ))}
       </ScrollView>
