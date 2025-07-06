@@ -4,7 +4,7 @@ import { useSafeAreaInsets, SafeAreaView } from "react-native-safe-area-context"
 import { Checkbox, IconButton } from "react-native-paper";
 import { TouchableOpacity } from "react-native";
 import { auth, db } from "../../firebaseConfig";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { setDoc, doc, collection, query, where, getDocs } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import Constants from "../../utils/Constants";
@@ -44,7 +44,14 @@ const ChefRegisterScreen = () => {
           status: "Pending Approval"
         });
 
-        Alert.alert("Registration Successful", "You will be verified by admin.");
+        // Immediately trigger email verification after registration, no user choice
+        if (user) {
+          await sendEmailVerification(user);
+          Alert.alert(
+            "Registration Successful",
+            "A verification email has been sent to your email address. Please check your inbox (and spam folder) before logging in. You will be verified by admin."
+          );
+        }
         setEmail('');
         setPassword('');
         setName('');
@@ -54,6 +61,16 @@ const ChefRegisterScreen = () => {
       } else {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+
+        // Check if email is verified
+        if (!user.emailVerified) {
+          await auth.signOut();
+          Alert.alert(
+            "Email Not Verified",
+            "Please verify your email address before logging in. Check your inbox (and spam folder) for the verification link."
+          );
+          return;
+        }
 
         const usersRef = collection(db, "kitchens");
         const q = query(usersRef, where("userId", "==", user.uid));
