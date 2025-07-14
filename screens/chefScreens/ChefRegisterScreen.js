@@ -62,15 +62,16 @@ const ChefRegisterScreen = () => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
+      
         // Check if email is verified
-        if (!user.emailVerified) {
+       /*  if (!user.emailVerified) {
           await auth.signOut();
           Alert.alert(
             "Email Not Verified",
             "Please verify your email address before logging in. Check your inbox (and spam folder) for the verification link."
           );
           return;
-        }
+        } */
 
         const usersRef = collection(db, "kitchens");
         const q = query(usersRef, where("userId", "==", user.uid));
